@@ -1,0 +1,37 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "storageAccountName": {
+                "type": "string",
+                "metadata": {
+                    "description": "The name of the storage account."
+                }
+            }      
+    },
+    "variables": {
+        "storageAccountType": "Standard_GRS",
+        // use of "toLower" function to convert the specified string to lower case.
+        // use of "concat" function as nested function to combine multiple string values and return the concatenated string.
+        // use of "uniqueString" function to creates a deterministic hash string based on the values provided as parameters.
+        "storageAccountName1": "[toLower( concat( parameters('storageAccountName'), uniqueString(resourceGroup().id) ) )]"  
+    },
+    "resources": [
+    {
+        //Pass on the storage account name as variable
+        "name": "[variables('storageAccountName1')]",
+        "type": "Microsoft.Storage/storageAccounts",
+        "apiVersion": "2019-06-01",
+        "tags": {
+            "displayName": "storageaccount1"
+        },
+        "location": "[resourceGroup().location]",
+        "kind": "StorageV2",
+        "sku": {
+            //Pass on the storage account type as variable
+            "name": "[variables('storageAccountType')]"            
+        }  
+    }
+    ],
+    "outputs": {}
+}

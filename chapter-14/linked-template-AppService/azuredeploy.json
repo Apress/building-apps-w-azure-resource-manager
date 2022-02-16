@@ -1,0 +1,83 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "_artifactsLocation": {
+            "type": "string",
+            "metadata": {
+                "description": "The base URI where artifacts required by this template are located."
+            },
+            "defaultValue": "https://ifabrik.blob.core.windows.net/"
+        },
+        "_artifactsLocationSasToken": {
+            "type": "securestring",
+            "metadata": {
+                "description": "The sasToken required to access _artifactsLocation"
+            },
+            "defaultValue": ""
+        },
+         "webAppName": {
+            "type": "string",
+                "defaultValue": "[concat('webApp-', uniqueString(resourceGroup().id))]",
+                "minLength": 2,
+            "metadata": {
+                "description": "Web app name."
+            }
+        },
+        "location": {
+            "type": "string",
+            "defaultValue": "[resourceGroup().location]",
+            "metadata": {
+                "description": "Location for all resources."
+            }
+        },
+        "linuxFxVersion": {
+            "type": "string",
+            "defaultValue": "DOTNETCORE|3.0",
+            "metadata": {
+                "description": "The Runtime stack of current web app"
+            }
+        },
+        "appServicePlanPortalName": {
+            "type": "string",
+            "defaultValue":"[concat('AppPlan-', parameters('webAppName'))]",
+            "metadata": {
+                "description": "description"
+            }
+        }
+        
+    },
+    "functions": [],
+    "variables": {
+        "appServicePlan-linkedTemplate": "https://gist.githubusercontent.com/daveRendon/67a94ea5280f676404da2ac20caef518/raw/9585910a67e29abe268dc3394912d24af8aea4c1/armTemplate-appServicePlan.json",
+        "appService-linkedTemplate": "[concat(parameters('_artifactsLocation'), 'armtemplates/appService.json', parameters('_artifactsLocationSasToken'))]"
+
+    },
+    "resources": [
+        {
+            "name": "appServicePlan",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2020-10-01",
+            "properties":{
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[concat(variables('appServicePlan-linkedTemplate'))]",
+                    "contentVersion": "1.0.0.0"
+                }
+            }
+        },
+        {
+            "name": "appService",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2020-10-01",
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[concat(variables('appService-linkedTemplate'))]",
+                    "contentVersion": "1.0.0.0"
+                }               
+            }
+        }
+    ],
+    "outputs": {}
+}

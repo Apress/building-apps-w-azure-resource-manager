@@ -1,0 +1,18 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "keyVaultName": {
+            "value": "ifabrikKeyVault" 
+        },
+        "objectId": {
+            "value": "8caeca97-d9f0-442d-8a57-18e25f48294c" 
+        },
+        "secretName": {
+            "value": "mySecretName" 
+        },
+        "secretValue": {
+            "value": "mySecretValue" 
+        }
+    }
+}

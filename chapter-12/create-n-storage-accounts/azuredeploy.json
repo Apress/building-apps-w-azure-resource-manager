@@ -1,0 +1,49 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "storageAccountName": {
+            "type": "string",
+            "metadata": {
+                "description": "Storage Account Name"
+            }
+        },
+        "itemCount": {
+            "type": "int",
+            "metadata": {
+                "description": "# of items to deploy"
+            }
+        }
+    },
+    "variables": {
+        "storageAccountType": "Standard_LRS"
+    },
+    "resources": [
+        {
+            "name": "[toLower(concat(parameters('storageAccountName'),copyIndex(),'dev'))]",
+            "copy":{
+                "name": "storagecopy",
+                "count": "[parameters('itemCount')]"
+            },
+            "type": "Microsoft.Storage/storageAccounts",
+            "apiVersion": "2019-06-01",
+            "tags": {
+                "displayName": "storageaccount1"
+            },
+            "location": "[resourceGroup().location]",
+            "kind": "StorageV2",
+            "sku": {
+                "name": "[variables('storageAccountType')]"
+            }
+        }
+    ],
+    "outputs": {
+        "storageAccounts": {
+            "type": "array",
+            "copy": {
+                "count": "[parameters('itemCount')]",
+                "input": "[reference(toLower(concat(parameters('storageAccountName'),copyIndex(),'dev'))).primaryEndpoints.blob]"
+            }
+        }
+    }
+}

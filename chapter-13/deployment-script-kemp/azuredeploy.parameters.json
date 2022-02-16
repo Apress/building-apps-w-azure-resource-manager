@@ -1,0 +1,132 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "networkInterfaceName": {
+            "value": "ifabrikNic"
+        },
+        "networkSecurityGroupName": {
+            "value": "ifabrikNsg"
+        },
+        "networkSecurityGroupRules": {
+            "value": [
+                {
+                   "name": "wui-rule",
+                   "properties": {
+                      "description": "Allow WUI",
+                      "protocol": "Tcp",
+                      "sourcePortRange": "*",
+                      "destinationPortRange": "8443",
+                      "sourceAddressPrefix": "*",
+                      "destinationAddressPrefix": "*",
+                      "access": "Allow",
+                      "priority": 100,
+                      "direction": "Inbound"
+                   }
+                },
+                {
+                   "name": "ssh-rule",
+                   "properties": {
+                      "description": "Allow SSH",
+                      "protocol": "Tcp",
+                      "sourcePortRange": "*",
+                      "destinationPortRange": "22",
+                      "sourceAddressPrefix": "*",
+                      "destinationAddressPrefix": "*",
+                      "access": "Allow",
+                      "priority": 101,
+                      "direction": "Inbound"
+                   }
+                },
+                {
+                   "name": "ssl-rule",
+                   "properties": {
+                      "description": "Allow SSL",
+                      "protocol": "Tcp",
+                      "sourcePortRange": "*",
+                      "destinationPortRange": "443",
+                      "sourceAddressPrefix": "*",
+                      "destinationAddressPrefix": "*",
+                      "access": "Allow",
+                      "priority": 103,
+                      "direction": "Inbound"
+                   }
+                },
+                {
+                   "name": "web-rule",
+                   "properties": {
+                      "description": "Allow WEB",
+                      "protocol": "Tcp",
+                      "sourcePortRange": "*",
+                      "destinationPortRange": "80",
+                      "sourceAddressPrefix": "*",
+                      "destinationAddressPrefix": "*",
+                      "access": "Allow",
+                      "priority": 104,
+                      "direction": "Inbound"
+                   }
+                }
+            ]
+        },
+        "subnetName": {
+            "value": "default"
+        },
+        "virtualNetworkName": {
+            "value": "ifabrik-vnet"
+        },
+        "addressPrefixes": {
+            "value": [
+                "10.0.0.0/16"
+            ]
+        },
+        "subnets": {
+            "value": [
+                {
+                    "name": "default",
+                    "properties": {
+                        "addressPrefix": "10.0.0.0/24"
+                    }
+                }
+            ]
+        },
+        "publicIpAddressName": {
+            "value": "ifabrik-pip"
+        },
+        "publicIpAddressType": {
+            "value": "Static"
+        },
+        "publicIpAddressSku": {
+            "value": "Standard"
+        },
+        "virtualMachineName": {
+            "value": "ifabrik-vm"
+        },
+        "virtualMachineComputerName": {
+            "value": "ifabrik-vm"
+        },
+        "virtualMachineRG": {
+            "value": "ifabrikRg"
+        },
+        "osDiskType": {
+            "value": "StandardSSD_LRS"
+        },
+        "virtualMachineSize": {
+            "value": "Standard_B4ms"
+        },
+        "adminUsername": {
+            "value": "bal"
+        },
+        "adminPassword": {
+            "value": "AzureKemp01!!"
+        },
+        "zone": {
+            "value": "1"
+        },
+        "storageAccountNamePrefix": {
+            "value": "ifabrik"
+        },
+        "storageAccountType": {
+            "value": "Standard_GRS"
+        }   
+    }
+}

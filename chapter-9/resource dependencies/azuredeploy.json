@@ -1,0 +1,39 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "ifabrikVirtualNetwork": {
+            "type": "string",
+            "defaultValue": "vNet",
+            "metadata": {
+                "description": "iFabrik VNet"
+            }
+        },
+        "ifabrikLoadBalancer": {
+            "type": "string",
+            "defaultValue": "vNet",
+            "metadata": {
+                "description": "iFabrik VNet"
+            }
+        }
+    },
+    "functions": [],
+    "variables": {
+        "ifabrikNetworkInterface": "ifabrik-networkinterface"
+    },
+    "resources": [
+        {
+            "type": "Microsoft.Network/networkInterfaces",
+            "apiVersion": "2020-06-01",
+            "name": "[variables('ifabrikNetworkInterface')]",
+            "location": "[resourceGroup().location]",
+            "dependsOn": [
+                //"[resourceId('<Resource Provider>', parameters('<parameterValue>'))]",
+                "[resourceId('Microsoft.Network/virtualNetworks/', parameters('ifabrikVirtualNetwork'))]",
+                "[resourceId('Microsoft.Network/loadBalancers/', parameters('ifabrikLoadBalancer'))]"
+            ]
+
+        }
+    ],
+    "outputs": {}
+}

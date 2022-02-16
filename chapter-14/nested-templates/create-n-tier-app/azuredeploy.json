@@ -1,0 +1,161 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "location": {
+            "type": "string",
+            "defaultValue": "eastus"
+        },
+        "webAppName": {
+            "type": "string",
+            "defaultValue": "[concat('webApp-')]",
+            "minLength": 2
+        },
+        "appServicePlan_name": {
+            "type": "string",
+            "defaultValue": "AppServicePlan-ifabrik"
+        }
+    },
+    "variables": {
+        "sku": "F1",
+        "linuxFxVersion": "DOTNETCORE|3.0",
+        "appServicePlanPortalName": "[concat('AppServicePlan-', parameters('webAppName'))]",
+        "resourceGroupName1": "ifabrik-rg-0",
+        "resourceGroupName2": "ifabrik-rg-1"
+    },
+    "resources": [
+        //Resource Groups
+        {
+            "name": "resourceGroups",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2020-10-01",
+            "location": "[parameters('location')]",
+            "properties": {
+                "expressionEvaluationOptions": {
+                    "scope": "inner"
+                },
+                "mode": "Incremental",
+                "parameters": {
+                },
+                "template": {
+                    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/subscriptionDeploymentTemplate.json#",
+                    "contentVersion": "1.0.0.0",
+                    "variables": {
+                        "resourceGroupName": "ifabrik-rg-"
+                    },
+                    "resources": [
+                        {
+                            "name": "[concat(variables('resourceGroupName'), copyIndex())]",
+                            "type": "Microsoft.Resources/resourceGroups",
+                            "apiVersion": "2019-10-01",
+                            "location": "eastus",
+                            // Copy works here when scope is inner
+                            "copy": {
+                                "name": "resourcegroupcopy",
+                                "count": 3
+                            }
+                        }
+                    ],
+                    "outputs": {
+                        "resourceGroupsList": {
+                            "type": "array",
+                            "copy": {
+                                "count": 3,
+                                "input": "[concat(variables('resourceGroupName'), copyIndex())]"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        //Nested template: App Service Plan
+        {
+            "name": "appServicePlan",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2020-10-01",
+            "resourceGroup": "[variables('resourceGroupName1')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Resources/deployments', 'resourceGroups')]"
+            ],
+            "properties": {
+                "expressionEvaluationOptions": {
+                    "scope": "outer"
+                },
+                "mode": "Incremental",
+                "template": {
+                    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+                    "contentVersion": "1.0.0.0",
+                    "resources": [
+                        {
+                            "type": "Microsoft.Web/serverfarms",
+                            "apiVersion": "2020-06-01",
+                            "name": "[variables('appServicePlanPortalName')]",
+                            "location": "[parameters('location')]",
+                            "sku": {
+                                "name": "[variables('sku')]"
+                            },
+                            "kind": "linux",
+                            "properties": {
+                                "reserved": true
+                            }
+                        }
+                    ],
+                    "outputs": {
+                        "appServicePlan": {
+                            "type": "string",
+                            "value": "[resourceId('Microsoft.Web/serverfarms', variables('appServicePlanPortalName'))]"
+                        }
+                    }
+                }
+            }
+        },
+        //App Service
+        //Nested template: App Service
+        {
+            "name": "appService",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2020-10-01",
+            "resourceGroup": "[variables('resourceGroupName2')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Resources/deployments', 'resourceGroups')]"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "expressionEvaluationOptions": {
+                    "scope": "outer"
+                },        
+                "template": {
+                    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+                    "contentVersion": "1.0.0.0",
+                   
+                    "resources": [
+                        {
+                            "name": "[parameters('webAppName')]",
+                            "type": "Microsoft.Web/sites",
+                            "apiVersion": "2018-11-01",
+                            "location": "eastus",
+                            "properties": {
+                                "name": "[concat(parameters('webAppName'))]",
+                                "serverFarmdId": "[parameters('appServicePlan_name')]"
+                            }
+                        }
+                    ],
+                    "outputs": {}
+                }
+            }
+        }
+    ],
+    "outputs": {
+        "resourceGroups": {
+            "type": "array",
+            "copy": {
+                "count": 1,
+                "input": "[reference('resourceGroups').outputs.resourceGroupsList.value]"
+            }
+        },
+        "appServicePlan": {
+            "type": "string",
+            "value": "[resourceId('Microsoft.Web/serverfarms', variables('appServicePlanPortalName'))]"
+        }
+    }
+}

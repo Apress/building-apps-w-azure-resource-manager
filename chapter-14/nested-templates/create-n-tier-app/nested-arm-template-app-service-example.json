@@ -1,0 +1,32 @@
+ //Nested template: App Service
+        {
+            "name": "appService",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2020-10-01",
+            "resourceGroup": "[variables('resourceGroupName2')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Resources/deployments', 'appServicePlan')]"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "expressionEvaluationOptions": {
+                    "scope": "outer"
+                },
+                "template": {
+                    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+                    "contentVersion": "1.0.0.0",
+                    "resources": [
+                        {
+                            "name": "[parameters('webAppName')]",
+                            "type": "Microsoft.Web/sites",
+                            "apiVersion": "2018-11-01",
+                            "location": "[parameters('location')]",
+                            "properties": {
+                                "name": "[parameters('webAppName')]",
+                                "serverFarmdId": "[concat('resourceGroups/', variables('resourceGroupName1'), resourceId('Microsoft.Web/serverfarms', variables('appServicePlanPortalName')))]"                            }
+                        }
+                    ],
+                    "outputs": {}
+                }
+            }
+        }

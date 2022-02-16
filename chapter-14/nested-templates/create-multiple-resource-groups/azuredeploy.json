@@ -1,0 +1,53 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/subscriptionDeploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "location": {
+            "type": "string",
+            "defaultValue":"eastus",
+            "metadata": {
+                "description": "Location"
+            }
+        }
+    },
+    "functions": [],
+    "variables": {
+        "resourceGroupName": "iFabrik-rg-"
+    },
+    "resources": [
+    {
+        "name": "[concat('nestedTemplate', copyIndex())]",
+        "type": "Microsoft.Resources/deployments",
+        "apiVersion": "2020-10-01",
+        "location": "[parameters('location')]",
+        "copy": {
+            "name": "resourcegroupcopy",
+            "count": 3
+            },
+        "properties": {
+            "expressionEvaluationOptions": {
+                "scope": "outer"
+            },
+            "mode": "Incremental",
+            "parameters": {
+            },
+            "template": {
+                "$schema": "https://schema.management.azure.com/schemas/2019-04-01/subscriptionDeploymentTemplate.json#",
+                "contentVersion": "1.0.0.0",
+                "parameters": {},
+                "variables": {},
+                "resources": [
+                    {
+                        "name": "[concat(variables('resourceGroupName'), copyIndex())]",
+                        "type": "Microsoft.Resources/resourceGroups",
+                        "apiVersion": "2019-10-01",
+                        "location": "[parameters('location')]"
+                    }
+                ],
+                "outputs": {}
+            }
+        }
+    }
+    ],
+    "outputs": {}
+}

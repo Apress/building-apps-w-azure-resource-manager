@@ -1,0 +1,22 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "webAppName": {
+            "value": "ifabrik"
+        },
+        "linuxFxVersion": {
+            "value": "DOTNETCORE|3.0"
+        },
+        "location": {
+            "value": "eastus" 
+        },
+        "_artifactsLocationSasToken": {
+            "value": "?sp=racwdyt&st=2021-07-13T21:12:35Z&se=2021-09-30T05:12:35Z&sv=2020-08-04&sr=b&sig=bgCyjIMBuTXEBGEHvbA3ykcfstPAhbtoh0tZ2dTqwPI%3D"
+        },
+        "_artifactsLocation": {
+            "value": "https://ifabrik.blob.core.windows.net/"
+        }
+    
+    }
+}

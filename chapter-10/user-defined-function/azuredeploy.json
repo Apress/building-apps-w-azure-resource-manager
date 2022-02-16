@@ -1,0 +1,66 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "storageAccountNamePrefix": {
+            "type": "string",
+            "metadata": {
+                "description": "The prefix of the storage account."
+            }
+        },
+        "storageCount": {
+            "type": "int",
+            "defaultValue": 3,
+            "metadata": {
+                "description": "Nunber of storage accounts to deploy"
+            }
+        }
+    },
+    "functions": [
+        {
+            "namespace": "iFabrikStorageAccounts",
+            "members": {
+                "uniqueName": {
+                    "parameters": [
+                        {
+                            "name": "prefix",
+                            "type": "string"
+                        },
+                        {
+                            "name": "increment",
+                            "type": "int"
+                        },
+                        {
+                            "name": "resourceType",
+                            "type": "string"
+                        }
+                    ],
+                    "output": {
+                        "type": "string",
+                        "value": "[toLower(concat(parameters('prefix'), parameters('increment'), parameters('resourceType')))]"
+                    }
+                }
+            }
+        }
+    ],
+    "variables": {
+        "storageAccountType": "Standard_LRS"
+    },
+    "resources": [
+        {
+            "type": "Microsoft.Storage/storageAccounts",
+            "apiVersion": "2019-04-01",
+            "name": "[iFabrikStorageAccounts.uniqueName(parameters('storageAccountNamePrefix'), copyIndex('storagecopy',1), 'storage')]", 
+            "location": "[resourceGroup().location]",
+            "sku": {
+                "name": "[variables('storageAccountType')]"
+            },
+            "kind": "Storage",
+            "properties": {},
+            "copy": {
+                "name": "storagecopy",
+                "count": "[parameters('storageCount')]"
+            }
+        }
+    ]
+}

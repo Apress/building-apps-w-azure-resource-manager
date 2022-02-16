@@ -1,0 +1,21 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {},
+    "functions": [],
+    "variables": {
+         "arrayVar": [
+            1,
+            2,
+            3,
+            4
+        ]
+    },
+    "resources": [],
+    "outputs": {
+        "arrayOutput": {
+            "type": "array",
+            "value": "[variables('arrayVar')]"
+        }
+    }
+}

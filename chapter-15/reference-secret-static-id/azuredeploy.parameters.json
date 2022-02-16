@@ -1,0 +1,41 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "adminUsername": {
+            "value": "ifabrikUser"
+        },
+        "adminPassword": {
+            "reference": {
+               "keyVault": {
+               "id": "/subscriptions/d988cbee-043f-4c46-9a59-dedb2119e48c/resourceGroups/iFabrik/providers/Microsoft.KeyVault/vaults/ifabrikKeyVault"
+               },
+               "secretName": "azVmPassword"
+            }
+          },
+        "dnsLabelPrefix": {
+            "value": "ifabrik" 
+        },
+        "publicIpName": {
+            "value": "myPublicIP"
+        },
+        "publicIPAllocationMethod": {
+            "value": "Dynamic"
+        },
+        "publicIpSku": {
+            "value": "Basic"
+        },
+        "OSVersion": {
+            "value": "2019-Datacenter"
+        },
+        "vmSize": {
+            "value": "Standard_D2_v3"
+        },
+        "location": {
+            "value": "eastus"
+        },
+        "vmName": {
+            "value": "ifabrik-vm"
+        }
+    }
+}

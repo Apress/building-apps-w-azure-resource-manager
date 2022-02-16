@@ -1,0 +1,50 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "storageAccountNames": {
+            "type": "array",
+            "defaultValue": [
+                "bob",
+                "stuart",
+                "dave"
+            ],
+            "metadata": {
+                "description": "Storage Account Name"
+            }
+        }
+    },
+    "variables": {
+        "storageAccountType": "Standard_LRS"
+    },
+    "resources": [
+        {
+            //when creating the name, will use the array position using [copyIndex()]
+            "name": "[toLower(concat(parameters('storageAccountNames')[copyIndex()],uniqueString(resourceGroup().id)))]",
+            "copy":{
+                "name": "storagecopy",
+                //get length of the parameter array
+                "count": "[length(parameters('storageAccountNames'))]"
+            },
+            "type": "Microsoft.Storage/storageAccounts",
+            "apiVersion": "2019-06-01",
+            "tags": {
+                "displayName": "storageaccount1"
+            },
+            "location": "[resourceGroup().location]",
+            "kind": "StorageV2",
+            "sku": {
+                "name": "[variables('storageAccountType')]"
+            }
+        }
+    ],
+    "outputs": {
+        "storageAccounts": {
+            "type": "array",
+            "copy": {
+                "count": "[length(parameters('storageAccountNames'))]",
+                "input": "[reference(toLower(concat(parameters('storageAccountNames')[copyIndex()],uniqueString(resourceGroup().id)))).primaryEndpoints.blob]"
+            }
+        }
+    }
+}

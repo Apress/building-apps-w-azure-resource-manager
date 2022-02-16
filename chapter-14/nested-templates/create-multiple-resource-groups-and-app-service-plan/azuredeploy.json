@@ -1,0 +1,142 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/subscriptionDeploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "location": {
+            "type": "string",
+            "defaultValue": "eastus",
+            "metadata": {
+                "description": "Location"
+            }
+        },
+        "webAppName": {
+            "type": "string",
+            "defaultValue": "[concat('webApp-')]",
+            "minLength": 2,
+            "metadata": {
+                "description": "Web app name."
+            }
+        },
+        "linuxFxVersion": {
+            "type": "string",
+            "defaultValue": "DOTNETCORE|3.0",
+            "metadata": {
+                "description": "The Runtime stack of current web app"
+            }
+        },
+        "repoUrl": {
+            "type": "string",
+            "defaultValue": " ",
+            "metadata": {
+                "description": "Optional Git Repo URL"
+            }
+        }
+
+    },
+    "functions": [],
+    "variables": {
+        "sku": "F1",
+        "appServicePlanPortalName": "[concat('AppServicePlan-', parameters('webAppName'))]",
+        "resourceGroupName1": "iFabrik-rg-0"
+    },
+    "resources": [
+        {
+            "name": "resourceGroups",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2020-10-01",
+            "location": "[parameters('location')]",
+            "properties": {
+                "expressionEvaluationOptions": {
+                    "scope": "inner"
+                },
+                "mode": "Incremental",
+                "parameters": {
+                },
+                "template": {
+                    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/subscriptionDeploymentTemplate.json#",
+                    "contentVersion": "1.0.0.0",
+                    "parameters": {
+
+                    },
+                    "variables": {
+                        "resourceGroupName": "iFabrik-rg-"
+                    },
+                    "resources": [
+                        {
+                            "name": "[concat(variables('resourceGroupName'), copyIndex())]",
+                            "type": "Microsoft.Resources/resourceGroups",
+                            "apiVersion": "2019-10-01",
+                            "location": "eastus",
+                            // Copy works here when scope is inner
+                            "copy": {
+                                "name": "resourcegroupcopy",
+                                "count": 3
+                            }
+                        }
+                    ],
+                    "outputs": {
+                        "resourceGroupsList": {
+                            "type": "array",
+                            "copy": {
+                                "count": 3,
+                                "input": "[concat(variables('resourceGroupName'), copyIndex())]"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        //Nested template: App Service Plan
+        {
+            "name": "appServicePlan",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2020-10-01",
+            //"location": "[parameters('location')]",
+            "resourceGroup": "[variables('resourceGroupName1')]",
+            //"resourceGroup":"[resourceId('Microsoft.Resources/resourceGroups', variables('resourceGroupName')[copyIndex()])]",
+            "dependsOn":[
+                "[resourceId('Microsoft.Resources/deployments', 'resourceGroups')]"
+            ],
+            "properties": {
+                "expressionEvaluationOptions": {
+                    "scope": "outer"
+                },
+                "mode": "Incremental",
+                "parameters": {
+                },
+                "template": {
+                    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+                    "contentVersion": "1.0.0.0",
+                    "parameters": {},
+                    "variables": {},
+                    "resources": [
+                        {
+                            "type": "Microsoft.Web/serverfarms",
+                            "apiVersion": "2020-06-01",
+                            "name": "[variables('appServicePlanPortalName')]",
+                            "location": "[parameters('location')]",
+                            "sku": {
+                                "name": "[variables('sku')]"
+                            },
+                            "kind": "linux",
+                            "properties": {
+                                "reserved": true
+                            }
+                        }
+                    ],
+                    "outputs": {}
+                }
+            }
+        }
+
+    ],
+    "outputs": {
+             "resourceGroups": {
+                            "type": "array",
+                            "copy": {
+                                "count": 1,
+                                "input": "[reference('resourceGroups').outputs.resourceGroupsList.value]"
+                            }
+                        }
+    }
+}

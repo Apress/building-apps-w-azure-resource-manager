@@ -1,0 +1,25 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "itemCount": {
+            "type": "int"
+        }
+    },
+    "variables": {
+        "copy": [
+            {
+                "name":"myArray",
+                "count":"[parameters('itemCount')]",
+                "input":"[concat('item', copyIndex('myArray',1))]"
+            }
+        ]
+    },
+    "resources": [],
+    "outputs": {
+        "arrayOutput": {
+            "type": "array",
+            "value": "[variables('myArray')]"
+        }
+    }
+}

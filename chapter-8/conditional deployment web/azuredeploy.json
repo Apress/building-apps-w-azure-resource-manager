@@ -1,0 +1,79 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "environmentType": {
+            "type": "string",
+            "allowedValues": [
+                "Production",
+                "Testing"
+            ],
+            "defaultValue": "Production"        
+        },
+        
+    "webAppName": {
+      "type": "string",
+      "defaultValue": "ifabrik",
+      "minLength": 2
+    }  
+    
+  },
+  "variables": {
+    "linuxFxVersion": "php|7.4",
+    "skuProduction": "S1",
+    "skuTesting": "F1",
+    "appServicePlanPortalNameProduction": "[concat('AppServicePlan-Prod-', parameters('webAppName'))]",
+    "appServicePlanPortalNameTesting": "[concat('AppServicePlan-Test-', parameters('webAppName'))]"
+   
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Web/serverfarms",
+      "apiVersion": "2020-06-01",
+      "name": "[variables('appServicePlanPortalNameProduction')]",
+      "location": "[resourceGroup().location]",
+      "sku": {
+        "name": "[variables('skuProduction')]"
+      },
+      "kind": "linux",
+        "properties": {
+          "reserved": true
+        }
+       
+    },
+    {
+      "type": "Microsoft.Web/serverfarms",
+      "apiVersion": "2020-06-01",
+      "name": "[variables('appServicePlanPortalNameTesting')]",
+      "location": "[resourceGroup().location]",
+      "sku": {
+        "name": "[variables('skuTesting')]"
+      },
+      "kind": "linux",
+        "properties": {
+          "reserved": true
+        }
+       
+    },
+
+    {
+      "condition": "[equals(parameters('environmentType'), 'Production')]",
+      "type": "Microsoft.Web/sites",
+      "apiVersion": "2020-06-01",
+      "name": "[parameters('webAppName')]",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/serverfarms', variables('appServicePlanPortalNameProduction'))]",
+        "[resourceId('Microsoft.Web/serverfarms', variables('appServicePlanPortalNameTesting'))]"
+      ],
+      "properties": {
+        "siteConfig": {
+          "linuxFxVersion": "[variables('linuxFxVersion')]"
+        },
+        
+        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('appServicePlanPortalNameProduction'))]"
+      }
+      
+    }
+  ]
+}
