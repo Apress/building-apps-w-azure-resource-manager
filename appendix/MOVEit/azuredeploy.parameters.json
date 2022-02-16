@@ -1,0 +1,63 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "location": {
+            "value": "westus2"
+        },
+        "virtualMachineSize": {
+            "value": "Standard_DS2_v2"
+        },
+        "adminUsername": {
+            "value": "miadmin"
+        },
+        "adminPassword": {
+            "value": "YourPassword"
+        },
+        "ci_custFirstName": {
+            "value": "Name"
+        },
+        "ci_custLastName": {
+            "value": "LastName"
+        },
+        "ci_custCompanyName": {
+            "value": "Compoany"
+        },
+        "ci_custEmail": {
+            "value": "YourMail"
+        },
+        "ci_custPhone": {
+            "value": "34729220191"
+        },
+        "ci_custCity": {
+            "value": "NYC"
+        },
+        "ci_custState": {
+            "value": "NYC"
+        },
+        "ci_custCountry": {
+            "value": "United States"
+        },
+        "mi_sysadminPassword": {
+            "value": "YourPassword"
+        },
+        "mi_emailTo": {
+            "value": "MailTo"
+        },
+        "mi_emailFrom": {
+            "value": "MailFrom"
+        },
+        "mi_smtpHost": {
+            "value": "SMTPServer"
+        },
+        "mi_smtpPort": {
+            "value": "587"
+        },
+        "mi_smtpUsername": {
+            "value": "SMTPUsername"
+        },
+        "mi_smtpPassword": {
+            "value": "Password"
+        }
+    }
+}

@@ -1,0 +1,21 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+      "accountPrefix": {
+        "value": "azinsider"
+      },
+      "vmSize": {
+        "value": "Standard_E4s_v3"
+      },
+      "storageDiskSizeGB": {
+        "value": 512
+      },
+      "adminUsername": {
+        "value": "azureuser"
+      },
+      "adminPasswordOrKey": {
+        "value": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQC32P1T68T9kSqbfJlMPhPV5yQAreYNWOV4FATjm8dmtE66mOj3S94JSinji6L/IEfWUXRqvnmcJ5Wvh6n2JHxLteZBCl0WIMBCPiOJMtUnCME2USqYl6rycehYYz0h9WzN2AHa1fMGJekMPB4ZOa6C5Aln3VHJ0+NO4EILuSibLGIwJv5w1bJegUyXo280hm5YsI6875xbCJ+NpOwpGRG9lie3drNfztHJFDv1Xi7CIQ+4flZC5q8/6ORsErUoNvQy04wlLuPfzlMbkNzcc6jCBAYer3wsg2zYgIC9qMFfh9roKafLZR82yOaV8akPbV/M/LwSn15o9i6Q19QgmKOzkyyLEA0X1yLWofftHhpxiNimA68MEZS18OJ5a4re1WDK5KYlG05Xjov+zGJgraVTDXSP18P2s4sa0TPthV7YpzRqbrAf7SnL1R94mdV/iJ0n/7Pa10oe1pTigtRtetCgmDZ2XMGciQhwUaUD3n2B34tHc9NH2Jmu0nsM4umPHZM2nOBFW4i9feLMKZ8MXOBIZWHZ033KGhRl13f4jDqJJZdcZptIPeCOFwjhydVytEr2k2aCA24BQNzPcuUzZk0sraxnFC4rlYM2BW1aRO0ClKuLLzEU4ZaJAzxHqc5RcdrqcH/UZYiqAsT3D5JjFgT8IMfPsQY2c7JFoTBm2jKfZQ== github-enterprise"
+      }
+    }
+  }

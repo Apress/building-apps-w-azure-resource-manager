@@ -1,0 +1,15 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "workspaceName": {
+            "value": "mlwazinsidermazinsiderm"
+        },
+        "computeName": {
+            "value": "mlazinsiderc"
+        },
+        "objectId": {
+            "value": "8cb73cf9-9568-492b-9ee2-bbdd86da30b5"
+        }
+    }
+}

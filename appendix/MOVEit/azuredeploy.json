@@ -1,0 +1,363 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "location": {
+            "type": "string"
+        },
+        "virtualMachineSize": {
+            "type": "string"
+        },
+        "adminUsername": {
+            "type": "string"
+        },
+        "adminPassword": {
+            "type": "securestring"
+        },
+        "mi_sysadminPassword": {
+            "type": "securestring"
+        },
+        "mi_emailTo": {
+            "type": "string"
+        },
+        "mi_emailFrom": {
+            "type": "string"
+        },
+        "mi_smtpHost": {
+            "type": "string"
+        },
+        "mi_smtpPort": {
+            "type": "string"
+        },
+        "mi_smtpUsername": {
+            "type": "string"
+        },
+        "mi_smtpPassword": {
+            "type": "securestring"
+        },
+        "ci_custFirstName": {
+            "type": "string"
+        },
+        "ci_custLastName": {
+            "type": "string"
+        },
+        "ci_custCompanyName": {
+            "type": "string"
+        },
+        "ci_custEmail": {
+            "type": "string"
+        },
+        "ci_custPhone": {
+            "type": "string"
+        },
+        "ci_custCity": {
+            "type": "string",
+            "defaultValue": ""
+        },
+        "ci_custState": {
+            "type": "string",
+            "defaultValue": ""
+        },
+        "ci_custCountry": {
+            "type": "string",
+            "defaultValue": ""
+        }
+    },
+    "variables": {
+        "virtualMachineName": "MIA",
+        "virtualNetworkName": "vnet1",
+        "networkInterfaceName": "nic1",
+        "networkSecurityGroupName": "nsg1",
+        "addressPrefix": "10.5.0.0/16",
+        "subnetName": "subnet1",
+        "subnetPrefix": "10.5.0.0/24",
+        "publicIpAddressName": "publicip1",
+        "publicIpAddressType": "dynamic",
+        "myPublisher": "progresssoftwarecorporation",
+        "myOffer": "moveit-automation-vm",
+        "mySKU": "moveit-automation-starter",
+        "myVersion": "latest",
+        "myImageReference": {
+            "publisher": "[variables('myPublisher')]",
+            "offer": "[variables('myOffer')]",
+            "sku": "[variables('mySKU')]",
+            "version": "[variables('myVersion')]"
+        },
+        "myPlan": {
+            "name": "[variables('mySKU')]",
+            "product": "[variables('myOffer')]",
+            "publisher": "[variables('myPublisher')]"
+        }
+    },
+    "resources": [
+        {
+            "name": "pid-f4ddf0e0-b9cf-4104-860f-2b39bda08d19-partnercenter",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2020-10-01",
+            "properties": {
+                "mode": "Incremental",
+                "template": {
+                    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+                    "contentVersion": "1.0.0.0",
+                    "resources": []
+                }
+            }
+        },
+        {
+            "name": "[variables('virtualMachineName')]",
+            "type": "Microsoft.Compute/virtualMachines",
+            "apiVersion": "2019-12-01",
+            "plan": "[variables('myPlan')]",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[concat('Microsoft.Network/networkInterfaces/', variables('networkInterfaceName'))]"
+            ],
+            "properties": {
+                "osProfile": {
+                    "computerName": "[variables('virtualMachineName')]",
+                    "adminUsername": "[parameters('adminUsername')]",
+                    "adminPassword": "[parameters('adminPassword')]",
+                    "windowsConfiguration": {
+                        "provisionVmAgent": "true"
+                    }
+                },
+                "hardwareProfile": {
+                    "vmSize": "[parameters('virtualMachineSize')]"
+                },
+                "storageProfile": {
+                    "imageReference": "[variables('myImageReference')]",
+                    "osDisk": {
+                        "name": "[variables('virtualMachineName')]",
+                        "createOption": "FromImage",
+                        "managedDisk": {
+                            "storageAccountType": "Standard_LRS"
+                        }
+                    }
+                },
+                "networkProfile": {
+                    "networkInterfaces": [
+                        {
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces', variables('networkInterfaceName'))]"
+                        }
+                    ]
+                }
+            },
+            "resources": [
+                {
+                    "apiVersion": "2018-06-01",
+                    "type": "extensions",
+                    "name": "CustomScriptExtension",
+                    "location": "[parameters('location')]",
+                    "dependsOn": [
+                        "[concat('Microsoft.Compute/virtualMachines/', variables('virtualMachineName'))]"
+                    ],
+                    "tags": {
+                        "displayName": "config-app"
+                    },
+                    "properties": {
+                        "publisher": "Microsoft.Compute",
+                        "type": "CustomScriptExtension",
+                        "typeHandlerVersion": "1.8",
+                        "autoUpgradeMinorVersion": true,
+                        "protectedSettings": {
+                            "commandToExecute": "[concat ('C:\\Deploy\\PreMIBoot.exe', ' -app mia -vmSize ', base64(parameters('virtualMachineSize')), ' -mi_emailTo ',  base64(parameters('mi_emailTo')), ' -mi_emailFrom ', base64(parameters('mi_emailFrom')), ' -mi_smtpHost ', base64(parameters('mi_smtpHost')), ' -mi_smtpPort ', base64(parameters('mi_smtpPort')), ' -mi_smtpUsername ', base64(parameters('mi_smtpUsername')), ' -mi_smtpPassword ', base64(parameters('mi_smtpPassword')), ' -mi_sysadminPassword ', base64(parameters('mi_sysadminPassword')),  ' -ci_custFirstName ', base64(parameters('ci_custFirstName')), ' -ci_custLastName ', base64(parameters('ci_custLastName')), ' -ci_custCompanyName ', base64(parameters('ci_custCompanyName')), ' -ci_custEmail ', base64(parameters('ci_custEmail')), ' -ci_custPhone ', base64(parameters('ci_custPhone')), ' -ci_custCity ', base64(parameters('ci_custCity')), ' -ci_custState ', base64(parameters('ci_custState')), ' -ci_custCountry ', base64(parameters('ci_custCountry')))]"
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "[variables('virtualNetworkName')]",
+            "type": "Microsoft.Network/virtualNetworks",
+            "apiVersion": "2018-11-01",
+            "location": "[parameters('location')]",
+            "properties": {
+                "addressSpace": {
+                    "addressPrefixes": [
+                        "[variables('addressPrefix')]"
+                    ]
+                },
+                "subnets": [
+                    {
+                        "name": "[variables('subnetName')]",
+                        "properties": {
+                            "addressPrefix": "[variables('subnetPrefix')]"
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "name": "[variables('networkInterfaceName')]",
+            "type": "Microsoft.Network/networkInterfaces",
+            "apiVersion": "2018-11-01",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/publicIPAddresses', variables('publicIPAddressName'))]",
+                "[resourceId('Microsoft.Network/virtualNetworks', variables('virtualNetworkName'))]",
+                "[resourceId('Microsoft.Network/networkSecurityGroups', variables('networkSecurityGroupName'))]"
+            ],
+            "properties": {
+                "ipConfigurations": [
+                    {
+                        "name": "ipconfig1",
+                        "properties": {
+                            "subnet": {
+                                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('virtualNetworkName'), variables('subnetName'))]"
+                            },
+                            "privateIPAllocationMethod": "Dynamic",
+                            "publicIpAddress": {
+                                "id": "[resourceId('Microsoft.Network/publicIpAddresses', variables('publicIpAddressName'))]"
+                            }
+                        }
+                    }
+                ],
+                "networkSecurityGroup": {
+                    "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('networkSecurityGroupName'))]"
+                }
+            }
+        },
+        {
+            "name": "[variables('publicIpAddressName')]",
+            "type": "Microsoft.Network/publicIpAddresses",
+            "apiVersion": "2018-11-01",
+            "location": "[parameters('location')]",
+            "properties": {
+                "publicIpAllocationMethod": "[variables('publicIpAddressType')]"
+            }
+        },
+        {
+            "name": "[variables('networkSecurityGroupName')]",
+            "type": "Microsoft.Network/networkSecurityGroups",
+            "apiVersion": "2018-11-01",
+            "location": "[parameters('location')]",
+            "properties": {
+                "securityRules": [
+                    {
+                        "name": "default-allow-rdp",
+                        "properties": {
+                            "priority": 1000,
+                            "sourceAddressPrefix": "*",
+                            "protocol": "Tcp",
+                            "destinationPortRange": "3389",
+                            "access": "Allow",
+                            "direction": "Inbound",
+                            "sourcePortRange": "*",
+                            "destinationAddressPrefix": "*"
+                        }
+                    },
+                    {
+                        "name": "HTTP-In",
+                        "properties": {
+                            "priority": 1010,
+                            "sourceAddressPrefix": "*",
+                            "protocol": "Tcp",
+                            "destinationPortRange": "80",
+                            "access": "Allow",
+                            "direction": "Inbound",
+                            "sourcePortRange": "*",
+                            "destinationAddressPrefix": "*"
+                        }
+                    },
+                    {
+                        "name": "HTTPS-In",
+                        "properties": {
+                            "priority": 1020,
+                            "sourceAddressPrefix": "*",
+                            "protocol": "Tcp",
+                            "destinationPortRange": "443",
+                            "access": "Allow",
+                            "direction": "Inbound",
+                            "sourcePortRange": "*",
+                            "destinationAddressPrefix": "*"
+                        }
+                    },
+                    {
+                        "name": "SSH-In",
+                        "properties": {
+                            "priority": 1030,
+                            "sourceAddressPrefix": "*",
+                            "protocol": "Tcp",
+                            "destinationPortRange": "22",
+                            "access": "Allow",
+                            "direction": "Inbound",
+                            "sourcePortRange": "*",
+                            "destinationAddressPrefix": "*"
+                        }
+                    },
+                    {
+                        "name": "FTP-In",
+                        "properties": {
+                            "priority": 1040,
+                            "sourceAddressPrefix": "*",
+                            "protocol": "Tcp",
+                            "destinationPortRange": "21",
+                            "access": "Allow",
+                            "direction": "Inbound",
+                            "sourcePortRange": "*",
+                            "destinationAddressPrefix": "*"
+                        }
+                    },
+                    {
+                        "name": "FTP-Implicit-In",
+                        "properties": {
+                            "priority": 1050,
+                            "sourceAddressPrefix": "*",
+                            "protocol": "Tcp",
+                            "destinationPortRange": "990",
+                            "access": "Allow",
+                            "direction": "Inbound",
+                            "sourcePortRange": "*",
+                            "destinationAddressPrefix": "*"
+                        }
+                    },
+                    {
+                        "name": "FTP-Data-In",
+                        "properties": {
+                            "priority": 1060,
+                            "sourceAddressPrefix": "*",
+                            "protocol": "Tcp",
+                            "destinationPortRange": "3000-3100",
+                            "access": "Allow",
+                            "direction": "Inbound",
+                            "sourcePortRange": "*",
+                            "destinationAddressPrefix": "*"
+                        }
+                    },
+                    {
+                        "name": "FTP-Explicit-CC-In",
+                        "properties": {
+                            "priority": 1070,
+                            "sourceAddressPrefix": "*",
+                            "protocol": "Tcp",
+                            "destinationPortRange": "10021",
+                            "access": "Allow",
+                            "direction": "Inbound",
+                            "sourcePortRange": "*",
+                            "destinationAddressPrefix": "*"
+                        }
+                    },
+                    {
+                        "name": "FTP-Implicit-CC-In",
+                        "properties": {
+                            "priority": 1080,
+                            "sourceAddressPrefix": "*",
+                            "protocol": "Tcp",
+                            "destinationPortRange": "10990",
+                            "access": "Allow",
+                            "direction": "Inbound",
+                            "sourcePortRange": "*",
+                            "destinationAddressPrefix": "*"
+                        }
+                    }
+                ]
+            }
+        }
+    ],
+    "outputs": {
+        "adminUsername": {
+            "type": "string",
+            "value": "[parameters('adminUsername')]"
+        }
+    }
+}
